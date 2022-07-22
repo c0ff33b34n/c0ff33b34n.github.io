@@ -9,6 +9,8 @@ Need Training!?
 
 Need a Job!?
 
+Wanna buy me a **Coffee**!?
+
 Wanna work with me!?
 
 Wanna **hire** me!?
