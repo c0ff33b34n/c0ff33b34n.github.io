@@ -11,4 +11,6 @@ Need a Job!?
 
 Wanna work with me!?
 
+Wanna **hire** me!?
+
 Come, Let's [talk](https://c0ff33b34n.github.io)!! XD
