@@ -9,4 +9,4 @@ Need a Job!?
 
 Wanna work with me!?
 
-Come, Let's [talk](https://www.example.com)!! XD
+Come, Let's [talk](https://c0ff33b34n.github.io)!! XD
