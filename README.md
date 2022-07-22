@@ -1,18 +1,18 @@
 #wh47_4r3_y0u_L00k1n9_f0r!?
 
 
-Need a **PenTest**!?
+Need a **PenTest**🔐!?
 
-Need a **WebSite**!?
+Need a **WebSite**🕸!?
 
-Need Training!?
+Need **Training**👨‍🏫!?
 
-Need a Job!?
+Need a **Job**💲💲!?
 
-Wanna buy me a **Coffee**!?
+Wanna buy me a **Coffee**😋!?
 
-Wanna work with me!?
+Wanna **work**🌐 with me!?
 
-Wanna **hire** me!?
+Wanna **hire**🤑 me!?
 
 Come, Let's [talk](https://c0ff33b34n.github.io)!! XD
