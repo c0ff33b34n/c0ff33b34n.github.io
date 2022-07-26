@@ -1,5 +1,6 @@
 const fadeOut = () => {
   const loaderWrapper.classList.add('fade');
+  document.querySelector('.wrapper');
   loaderWrapper.classList.add('fade');
 }
 
