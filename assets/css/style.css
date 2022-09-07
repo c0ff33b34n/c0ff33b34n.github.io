@@ -156,7 +156,7 @@ a {
   -o-border-radius: 15px;
 }
 #tabs .body .para p {
-  margin-right: 15px;
+  margin-right: 0px;
   padding: 1vh 0;
 }
 #tabs .body a.button:hover {
