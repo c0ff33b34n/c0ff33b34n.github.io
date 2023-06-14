@@ -7,47 +7,106 @@
 	<link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg">
 	<script type="text/javascript">
 		function getKeywords(){
-		    $.get($('#url').val(), function(resp) {
-			    document.getElementById('keywords').value = resp;
+			$.get($('#url').val(), function(resp) {
+				document.getElementById('keywords').value = resp;
 			});
-		} <!-- c0ff33b34n -->
+		}
 
 		function Generate(){
 			$("#result").empty();
 			$.each($('#keywords').val().split('\n'), function(){
-			  var link = "https://github.com/search?q="+$('#target').val()+" "+this+"&type=Code";
-			  $('#result').append("<tr><td><input type=\"checkbox\"></td><td> <a href=\""+encodeURI(link)+"\" target=\"_blank\">"+this+"</td></tr>");
+				var link = "https://github.com/search?q="+$('#target').val()+" "+this+"&type=Code";
+				$('#result').append("<tr><td><input type=\"checkbox\"></td><td><a href=\""+encodeURI(link)+"\" target=\"_blank\">"+this+"</a></td></tr>");
 			});
 		}
 	</script>
-	<script src="jquery-2.1.3.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<style>
+		body {
+			padding-top: 40px;
+		}
+
+		.container {
+			max-width: 500px;
+		}
+
+		h1 {
+			font-size: 28px;
+			margin-bottom: 20px;
+		}
+
+		table {
+			width: 100%;
+		}
+
+		input[type="text"] {
+			width: 100%;
+			padding: 5px;
+			border-radius: 3px;
+			border: 1px solid #ccc;
+		}
+
+		button {
+			padding: 5px 10px;
+			border-radius: 3px;
+			border: none;
+			background-color: #007bff;
+			color: #fff;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background-color: #0056b3;
+		}
+
+		textarea {
+			width: 100%;
+			padding: 5px;
+			border-radius: 3px;
+			border: 1px solid #ccc;
+			resize: vertical;
+		}
+
+		#result {
+			height: 300px;
+			width: 100%;
+			overflow: auto;
+			border: 1px solid #ccc;
+			padding: 5px;
+		}
+
+		h5 {
+			font-size: 12px;
+			margin-top: 20px;
+		}
+	</style>
 </head>
 <body>
-	<center>
-	<h1>GitHub Dorking Simplified</h1>
-	<table>
-		<tr>
-			<td>From URL </td>
-			<td>: <input type="text" id="url" value="https://raw.githubusercontent.com/c0ff33b34n/c0ff33b34n.github.io/main/gitdork/githubdork.txt"></td>
-			<td><button onclick="getKeywords()"> Get Keywords</button></td>
-		</tr>
-		<tr>
-			<td>Target </td>
-			<td>: <input type="text" id="target" placeholder='"target" or org:target'></td>
-			<td><button onclick="Generate()"> Generate Link</button></td>
-		</tr>
-		
-	</table>		
-	<textarea id="keywords" cols="46" rows="10"></textarea> 
-	<br>
-
-	<table>
-		<div id="result" style="height:300px;width:350px;overflow:scroll;"></div>
-	</table>
-	<br>
-	<h5>2022 | Created by <a href="https://c0ff33b34n.github.io">c0ff33b34n</a></h5>
-</center>
-	<br>
+	<div class="container">
+		<center>
+			<h1>GitHub Dorking Simplified</h1>
+			<table>
+				<tr>
+					<td>From URL:</td>
+					<td><input type="text" id="url" value="https://raw.githubusercontent.com/c0ff33b34n/c0ff33b34n.github.io/main/gitdork/githubdork.txt"></td>
+					<td><button onclick="getKeywords()">Get Keywords</button></td>
+				</tr>
+				<tr>
+					<td>Target:</td>
+					<td><input type="text" id="target" placeholder='"target" or org:target'></td>
+					<td><button onclick="Generate()">Generate Link</button></td>
+				</tr>
+			</table>
+			<br>
+			<textarea id="keywords" cols="46" rows="10"></textarea>
+			<br>
+			<table>
+				<div id="result"></div>
+			</table>
+			<br>
+			<h5>2022 | Created by <a href="https://c0ff33b34n.github.io">c0ff33b34n</a></h5>
+		</center>
+	</div>
 </body>
 </html>
