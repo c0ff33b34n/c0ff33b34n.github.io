@@ -1,5 +1,0 @@
-##
-gitDork: https://c0ff33b34n.github.io/gitdork/gitdork.html
-##
-ClickJacking test: https://c0ff33b34n.github.io/cj/cj.html
-##
