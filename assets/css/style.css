@@ -176,7 +176,7 @@ a {
   -o-transition: all 1s;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 25px;
-  height: 280px;
+  height: auto;
   overflow: hidden;
   padding: 20px 0;
 }
