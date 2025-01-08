@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Position Size Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #b3b3b3;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2c2c2c;
+            color: #ffffff;
+        }
+
+        input:focus, select:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-container label {
+            flex: 1;
+            text-align: center;
+            margin: 0;
+        }
+
+        .toggle-container input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-container label {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #2c2c2c;
+            border: 1px solid #333;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-container input[type="radio"]:checked + label {
+            background-color: #4caf50;
+            color: #ffffff;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        button.reset {
+            background-color: #f44336;
+            width: 48%;
+        }
+
+        button.reset:hover {
+            background-color: #e53935;
+        }
+
+        button.calculate {
+            background-color: #4caf50;
+            width: 48%;
+        }
+
+        button.calculate:hover {
+            background-color: #45a049;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 4%;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #333;
+            background-color: #2c2c2c;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .results p {
+            margin: 5px 0;
+        }
+
+        .validation-message {
+            color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Position Size Calculator</h1>
+
+        <div class="form-group">
+            <label for="currencyPair">Currency Pair:</label>
+            <select id="currencyPair" aria-label="Currency Pair">
+                <option value="10">EUR/USD</option>
+                <option value="10">GBP/USD</option>
+                <option value="100">USD/JPY</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="accountCurrency">Account Currency:</label>
+            <select id="accountCurrency" aria-label="Account Currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="accountSize">Account Size:</label>
+            <input type="number" id="accountSize" placeholder="Enter your account size" aria-label="Account Size" min="0.01">
+            <p id="validationAccountSize" class="validation-message" aria-live="polite">Account size must be a valid number greater than zero.</p>
+        </div>
+
+        <div class="form-group toggle-container">
+            <input type="radio" id="riskPercentageOption" name="riskOption" value="percentage" checked>
+            <label for="riskPercentageOption">Risk as %</label>
+            <input type="radio" id="riskAmountOption" name="riskOption" value="amount">
+            <label for="riskAmountOption">Risk as USD</label>
+        </div>
+
+        <div class="form-group" id="riskPercentageGroup">
+            <label for="riskPercentage">Risk Ratio (%):</label>
+            <input type="number" id="riskPercentage" placeholder="Enter risk percentage" aria-label="Risk Ratio" min="0.01">
+            <p id="validationRiskPercentage" class="validation-message" aria-live="polite">Risk percentage must be a valid number greater than zero.</p>
+        </div>
+
+        <div class="form-group" id="riskAmountGroup" style="display: none;">
+            <label for="riskAmount">Risk Amount (USD):</label>
+            <input type="number" id="riskAmount" placeholder="Enter risk amount in USD" aria-label="Risk Amount" min="0.01">
+            <p id="validationRiskAmount" class="validation-message" aria-live="polite">Risk amount must be a valid number greater than zero.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="stopLoss">Stop-Loss (Pips):</label>
+            <input type="number" id="stopLoss" placeholder="Enter stop loss in pips" aria-label="Stop-Loss" min="0.01">
+            <p id="validationStopLoss" class="validation-message" aria-live="polite">Stop-loss must be a valid number greater than zero.</p>
+        </div>
+
+        <div class="button-group">
+            <button id="resetBtn" class="reset">Reset</button>
+            <button id="calculateBtn" class="calculate">Calculate</button>
+        </div>
+
+        <div class="results" id="results">
+            <p><strong>Money at Risk:</strong> <span id="moneyRisk"></span></p>
+            <p><strong>Position Size:</strong> <span id="lotSize"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const results = document.getElementById('results');
+        const moneyRiskSpan = document.getElementById('moneyRisk');
+        const lotSizeSpan = document.getElementById('lotSize');
+
+        const riskPercentageOption = document.getElementById('riskPercentageOption');
+        const riskAmountOption = document.getElementById('riskAmountOption');
+        const riskPercentageGroup = document.getElementById('riskPercentageGroup');
+        const riskAmountGroup = document.getElementById('riskAmountGroup');
+
+        function validateInput(input, errorElementId) {
+            const errorElement = document.getElementById(errorElementId);
+            if (isNaN(input) || input <= 0) {
+                errorElement.style.display = 'block';
+                return false;
+            }
+            errorElement.style.display = 'none';
+            return true;
+        }
+
+        function calculateRisk(accountSize, riskPercentage, riskAmount) {
+            if (riskAmountOption.checked) {
+                return riskAmount;
+            }
+            return (accountSize * riskPercentage) / 100;
+        }
+
+        function calculateLotSize(moneyRisk, stopLoss, pipValue) {
+            return moneyRisk / (stopLoss * pipValue);
+        }
+
+        riskPercentageOption.addEventListener('change', function () {
+            riskPercentageGroup.style.display = 'block';
+            riskAmountGroup.style.display = 'none';
+        });
+
+        riskAmountOption.addEventListener('change', function () {
+            riskPercentageGroup.style.display = 'none';
+            riskAmountGroup.style.display = 'block';
+        });
+
+        calculateBtn.addEventListener('click', function () {
+            const accountSize = parseFloat(document.getElementById('accountSize').value);
+            const riskPercentage = parseFloat(document.getElementById('riskPercentage').value);
+            const riskAmount = parseFloat(document.getElementById('riskAmount').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+            const pipValue = parseFloat(document.getElementById('currencyPair').value);
+
+            const isAccountSizeValid = validateInput(accountSize, 'validationAccountSize');
+            const isStopLossValid = validateInput(stopLoss, 'validationStopLoss');
+
+            let isRiskValid = false;
+            if (riskAmountOption.checked) {
+                isRiskValid = validateInput(riskAmount, 'validationRiskAmount');
+            } else {
+                isRiskValid = validateInput(riskPercentage, 'validationRiskPercentage');
+            }
+
+            if (!isAccountSizeValid || !isStopLossValid || !isRiskValid) {
+                results.style.display = 'none';
+                return;
+            }
+
+            const moneyRisk = calculateRisk(accountSize, riskPercentage, riskAmount);
+            const lotSize = calculateLotSize(moneyRisk, stopLoss, pipValue);
+
+            moneyRiskSpan.textContent = `$${moneyRisk.toFixed(2)}`;
+            lotSizeSpan.textContent = `${lotSize.toFixed(2)} lots`;
+            results.style.display = 'block';
+        });
+
+        resetBtn.addEventListener('click', function () {
+            document.getElementById('accountSize').value = '';
+            document.getElementById('riskPercentage').value = '';
+            document.getElementById('riskAmount').value = '';
+            document.getElementById('stopLoss').value = '';
+            document.getElementById('currencyPair').value = '10';
+            document.getElementById('accountCurrency').value = 'USD';
+            riskPercentageOption.checked = true;
+            riskAmountOption.checked = false;
+            riskPercentageGroup.style.display = 'block';
+            riskAmountGroup.style.display = 'none';
+            results.style.display = 'none';
+
+            const validationMessages = document.querySelectorAll('.validation-message');
+            validationMessages.forEach((message) => (message.style.display = 'none'));
+        });
+    </script>
+</body>
+</html>
