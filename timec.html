@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+        }
+        input, select {
+            margin: 10px;
+            padding: 5px;
+            background-color: #333;
+            color: #ffffff;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+        button {
+            margin: 10px;
+            padding: 5px;
+            background-color: #32CD32;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2e8b57;
+        }
+        .live-time {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Time Converter</h2>
+        <label for="timeInput">Select Time:</label>
+        <input type="time" id="timeInput">
+        <select id="timezoneInput">
+            <option value="IST">IST</option>
+            <option value="EST">EST</option>
+            <option value="UTC">UTC</option>
+        </select>
+        <button onclick="convertTime()">Convert</button>
+        <h3>Converted Times:</h3>
+        <p>IST: <span id="istTime">--:--</span></p>
+        <p>EST: <span id="estTime">--:--</span></p>
+        <p>UTC: <span id="utcTime">--:--</span></p>
+        <h3>Live Local Time:</h3>
+        <p class="live-time" id="localTime">--:--</p>
+    </div>
+    <script>
+        function convertTime() {
+            let time = document.getElementById("timeInput").value;
+            let timezone = document.getElementById("timezoneInput").value;
+            if (!time) {
+                alert("Please select a time");
+                return;
+            }
+            
+            let [hours, minutes] = time.split(":").map(Number);
+            let date = new Date();
+            date.setUTCHours(hours, minutes, 0, 0);
+
+            let offsets = {
+                "IST": 5.5 * 60,
+                "EST": -5 * 60,
+                "UTC": 0
+            };
+
+            let selectedOffset = offsets[timezone];
+            let utcDate = new Date(date.getTime() - (selectedOffset * 60000));
+
+            document.getElementById("istTime").textContent = formatTime(new Date(utcDate.getTime() + (5.5 * 60 * 60000)));
+            document.getElementById("estTime").textContent = formatTime(new Date(utcDate.getTime() - (5 * 60 * 60000)));
+            document.getElementById("utcTime").textContent = formatTime(utcDate);
+        }
+
+        function formatTime(date) {
+            let hours = date.getUTCHours().toString().padStart(2, '0');
+            let minutes = date.getUTCMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function updateLocalTime() {
+            let now = new Date();
+            document.getElementById("localTime").textContent = now.toLocaleTimeString();
+        }
+
+        setInterval(updateLocalTime, 1000);
+        updateLocalTime();
+    </script>
+</body>
+</html>
