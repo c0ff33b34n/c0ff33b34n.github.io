@@ -1,0 +1,34 @@
+//@version=5
+indicator("ExtSB", overlay=true)
+
+// Define key times in EST for today and future days
+days_to_plot = 3  // Adjust how many days into the future to draw lines
+times = array.new<int>()
+
+for i = -1 to days_to_plot  // -1 ensures we include yesterday for historical reference
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 2, 45))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 3, 0))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 3, 15))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 3, 45))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 4, 0))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 4, 15))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 9, 45))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 10, 0))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 10, 15))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 10, 45))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 11, 0))
+    array.push(times, timestamp(year(time), month(time), dayofmonth(time) + i, 11, 15))
+
+// Define Y-axis levels
+top_level = ta.highest(high, 50)
+bottom_level = ta.lowest(low, 50)
+
+// Draw vertical lines without duplicates
+for i = 0 to array.size(times) - 1
+    line_time = array.get(times, i)
+
+    // Check if the line is within a valid range to avoid unnecessary lines
+    if time >= line_time - 24 * 60 * 60000 and time <= timestamp(year(time), month(time), dayofmonth(time) + days_to_plot, 0, 0)
+        line.new(x1=line_time, y1=top_level, x2=line_time, y2=bottom_level, 
+                 xloc=xloc.bar_time, color=color.gray, width=1, 
+                 style=line.style_dashed, extend=extend.both)
