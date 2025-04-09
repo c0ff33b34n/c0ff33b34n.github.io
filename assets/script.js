@@ -132,123 +132,231 @@ window.addEventListener('scroll', () => {
 
 // Slider functionality
 document.addEventListener('DOMContentLoaded', () => {
-    const track = document.querySelector('.skills-track');
-    const cards = document.querySelectorAll('.skill-card');
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const dotsContainer = document.querySelector('.slider-dots');
+  const track = document.querySelector('.skills-track');
+  const cards = document.querySelectorAll('.skill-card');
+  const prevBtn = document.querySelector('.prev-btn');
+  const nextBtn = document.querySelector('.next-btn');
+  const dotsContainer = document.querySelector('.slider-dots');
+  const sliderContainer = document.querySelector('.skills-slider-container');
+  const slider = document.querySelector('.skills-slider');
 
-    let currentIndex = 0;
-    const cardWidth = 300; // Width of each card
-    const gap = 32; // Gap between cards (2rem = 32px)
+  let currentIndex = 0;
+  let maxIndex = 0;
+  let cardsPerView = 0;
+  
+  // Function to check if in mobile view
+  function isMobileView() {
+    return window.innerWidth <= 480;
+  }
+  
+  // Function to calculate dimensions based on current viewport
+  function calculateDimensions() {
+    const containerWidth = slider.clientWidth;
+    const cardStyle = window.getComputedStyle(cards[0]);
+    const cardWidth = parseInt(cardStyle.getPropertyValue('min-width'), 10);
+    const cardMargin = parseInt(cardStyle.getPropertyValue('margin-right'), 10) || 0;
+    const gap = parseInt(window.getComputedStyle(track).getPropertyValue('gap'), 10) || 32;
     
-    // Create dots
-    cards.forEach((_, index) => {
-        const dot = document.createElement('div');
-        dot.classList.add('dot');
-        if (index === 0) dot.classList.add('active');
-        dotsContainer.appendChild(dot);
-        
-        dot.addEventListener('click', () => {
-            goToSlide(index);
-        });
-    });
+    // Calculate how many cards can fit in view (full cards only)
+    cardsPerView = Math.max(1, Math.floor(containerWidth / (cardWidth + gap)));
+    
+    // Calculate max index
+    maxIndex = Math.max(0, cards.length - cardsPerView);
+    
+    return { cardWidth, gap };
+  }
 
+  // Initialize dimensions
+  const { cardWidth, gap } = calculateDimensions();
+
+  // Create dots only for valid scroll positions
+  function createDots() {
+    dotsContainer.innerHTML = ''; // Clear existing dots
+    
+    // For mobile view with a single card showing, create one dot per card
+    const showMobileDots = isMobileView();
+    const dotsCount = showMobileDots ? cards.length : (maxIndex + 1);
+    
+    for (let i = 0; i < dotsCount; i++) {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      
+      if (i === currentIndex) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        goToSlide(i);
+      });
+      
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  // Initialize dots
+  createDots();
+
+  // Update dots
+  function updateDots() {
     const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentIndex);
+    });
+  }
 
-    // Update dots
-    function updateDots() {
-        dots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentIndex);
-        });
+  // Slide to position
+  function goToSlide(index) {
+    // Recalculate dimensions to ensure accuracy
+    const dimensions = calculateDimensions();
+    const cardWidth = dimensions.cardWidth;
+    const gap = dimensions.gap;
+    
+    // Limit index to valid range based on view mode
+    const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+    currentIndex = Math.max(0, Math.min(index, maxLimit));
+    
+    // For mobile view, ensure each card is perfectly centered
+    if (isMobileView()) {
+      // Get exact container width including padding
+      const sliderWidth = slider.clientWidth;
+      const containerPadding = (sliderContainer.clientWidth - sliderWidth) / 2;
+      
+      // Calculate the exact center position
+      // This accounts for the card width, gap between cards, and container padding
+      const cardTotalWidth = cardWidth;
+      
+      // Calculate offset to perfectly center the card
+      // We need to account for: card width, gap, current index, and center position
+      const offset = -(currentIndex * (cardWidth + gap)) + (sliderWidth - cardWidth) / 2;
+      
+      track.style.transform = `translateX(${offset}px)`;
+    } else {
+      // Normal scrolling behavior for desktop
+      const offset = -(cardWidth + gap) * currentIndex;
+      track.style.transform = `translateX(${offset}px)`;
     }
-
-    // Slide to position
-    function goToSlide(index) {
-        currentIndex = index;
-        const offset = -(cardWidth + gap) * currentIndex;
-        track.style.transform = `translateX(${offset}px)`;
-        updateDots();
-        updateButtons();
-    }
-
-    // Update button states
-    function updateButtons() {
-        prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
-        nextBtn.style.opacity = currentIndex === cards.length - 1 ? '0.5' : '1';
-        prevBtn.style.cursor = currentIndex === 0 ? 'not-allowed' : 'pointer';
-        nextBtn.style.cursor = currentIndex === cards.length - 1 ? 'not-allowed' : 'pointer';
-    }
-
-    // Previous slide
-    prevBtn.addEventListener('click', () => {
-        if (currentIndex > 0) {
-            goToSlide(currentIndex - 1);
-        }
-    });
-
-    // Next slide
-    nextBtn.addEventListener('click', () => {
-        if (currentIndex < cards.length - 1) {
-            goToSlide(currentIndex + 1);
-        }
-    });
-
-    // Auto slide every 5 seconds
-    let autoSlideInterval = setInterval(() => {
-        if (currentIndex < cards.length - 1) {
-            goToSlide(currentIndex + 1);
-        } else {
-            goToSlide(0);
-        }
-    }, 5000);
-
-    // Pause auto slide on hover
-    const sliderContainer = document.querySelector('.skills-slider-container');
-    sliderContainer.addEventListener('mouseenter', () => {
-        clearInterval(autoSlideInterval);
-    });
-
-    sliderContainer.addEventListener('mouseleave', () => {
-        autoSlideInterval = setInterval(() => {
-            if (currentIndex < cards.length - 1) {
-                goToSlide(currentIndex + 1);
-            } else {
-                goToSlide(0);
-            }
-        }, 5000);
-    });
-
-    // Initialize button states
+    
+    updateDots();
     updateButtons();
+  }
 
-    // Add touch support
-    let touchStartX = 0;
-    let touchEndX = 0;
+  // Update button states
+  function updateButtons() {
+    const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+    prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+    nextBtn.style.opacity = currentIndex >= maxLimit ? '0.5' : '1';
+    prevBtn.style.cursor = currentIndex === 0 ? 'not-allowed' : 'pointer';
+    nextBtn.style.cursor = currentIndex >= maxLimit ? 'not-allowed' : 'pointer';
+  }
 
-    track.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
-    });
-
-    track.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-    });
-
-    function handleSwipe() {
-        const swipeThreshold = 50; // minimum distance for swipe
-        const diff = touchStartX - touchEndX;
-
-        if (Math.abs(diff) > swipeThreshold) {
-            if (diff > 0 && currentIndex < cards.length - 1) {
-                // Swipe left
-                goToSlide(currentIndex + 1);
-            } else if (diff < 0 && currentIndex > 0) {
-                // Swipe right
-                goToSlide(currentIndex - 1);
-            }
-        }
+  // Previous slide
+  prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) {
+      goToSlide(currentIndex - 1);
     }
+  });
+
+  // Next slide
+  nextBtn.addEventListener('click', () => {
+    const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+    if (currentIndex < maxLimit) {
+      goToSlide(currentIndex + 1);
+    }
+  });
+
+  // Auto slide every 5 seconds
+  let autoSlideInterval = setInterval(() => {
+    const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+    if (currentIndex < maxLimit) {
+      goToSlide(currentIndex + 1);
+    } else {
+      goToSlide(0);
+    }
+  }, 5000);
+
+  // Pause auto slide on hover
+  sliderContainer.addEventListener('mouseenter', () => {
+    clearInterval(autoSlideInterval);
+  });
+
+  sliderContainer.addEventListener('mouseleave', () => {
+    autoSlideInterval = setInterval(() => {
+      const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+      if (currentIndex < maxLimit) {
+        goToSlide(currentIndex + 1);
+      } else {
+        goToSlide(0);
+      }
+    }, 5000);
+  });
+
+  // Handle window resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    
+    // Debounce resize events
+    resizeTimer = setTimeout(() => {
+      // Recalculate dimensions
+      calculateDimensions();
+      
+      // Recreate dots if mobile state changed
+      const wasMobile = dotsContainer.children.length === cards.length;
+      const isMobile = isMobileView();
+      
+      if (wasMobile !== isMobile) {
+        createDots();
+      }
+      
+      // Reposition slides based on new dimensions
+      goToSlide(currentIndex);
+    }, 200);
+  });
+
+  // Initialize button states
+  updateButtons();
+
+  // Add touch support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    clearInterval(autoSlideInterval); // Pause auto-slide on touch
+  });
+
+  track.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+    
+    // Restart auto-slide after touch
+    autoSlideInterval = setInterval(() => {
+      const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+      if (currentIndex < maxLimit) {
+        goToSlide(currentIndex + 1);
+      } else {
+        goToSlide(0);
+      }
+    }, 5000);
+  });
+
+  function handleSwipe() {
+    const swipeThreshold = 50; // minimum distance for swipe
+    const diff = touchStartX - touchEndX;
+
+    if (Math.abs(diff) > swipeThreshold) {
+      const maxLimit = isMobileView() ? cards.length - 1 : maxIndex;
+      if (diff > 0 && currentIndex < maxLimit) {
+        // Swipe left
+        goToSlide(currentIndex + 1);
+      } else if (diff < 0 && currentIndex > 0) {
+        // Swipe right
+        goToSlide(currentIndex - 1);
+      }
+    }
+  }
+  
+  // Call initial slide setup after a small delay to ensure all styles are applied
+  setTimeout(() => {
+    goToSlide(0);
+  }, 50);
 });
 
 // Hamburger Menu

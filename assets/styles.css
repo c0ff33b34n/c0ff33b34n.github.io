@@ -210,6 +210,10 @@ section h2 {
     background: var(--primary-color);
 }
 
+.about-list{
+    margin-left: 20px;
+}
+
 .about-content {
     max-width: 800px;
     margin: 0 auto;
@@ -223,27 +227,34 @@ section h2 {
 
 /* Skills Section */
 .skills {
-    padding: 5rem 2rem;
+    padding: 4rem 1rem;
     background-color: var(--dark-bg);
     overflow: hidden;
+}
+
+.skills h2 {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
 .skills-slider-container {
     position: relative;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 60px;
+    padding: 0 50px;
 }
 
 .skills-slider {
     overflow: hidden;
     margin: 0 auto;
+    padding-top: 10px;
 }
 
 .skills-track {
     display: flex;
     transition: transform 0.5s ease;
     gap: 2rem;
+    will-change: transform;
 }
 
 .skill-card {
@@ -302,11 +313,11 @@ section h2 {
 }
 
 .prev-btn {
-    left: 0;
+    left: 5px;
 }
 
 .next-btn {
-    right: 0;
+    right: 5px;
 }
 
 .slider-dots {
@@ -329,6 +340,7 @@ section h2 {
     background: var(--secondary-color);
 }
 
+
 /* Projects Section */
 .project-grid {
     display: grid;
@@ -343,27 +355,31 @@ section h2 {
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent, rgba(144, 238, 144, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
 }
 
 .project-card:hover {
     transform: translateY(-5px);
-    border-color: var(--secondary-color);
+    box-shadow: 0 10px 20px rgba(144, 238, 144, 0.1);
 }
 
-.project-card h3 {
-    color: var(--secondary-color);
-    margin-bottom: 1rem;
-}
-
-.project-card p, .project-card ul {
-    color: var(--text-color);
-}
-
-.project-card ul {
-    list-style-position: inside;
-    margin-top: 1rem;
+.project-card:hover::before {
+    transform: translateX(100%);
 }
 
 /* Contact Section */
@@ -599,9 +615,21 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .nav-content {
+
+    .logo {
+        font-size: 1.1rem;
+        
+    }
+
+    .hero-buttons{
+        display: flex;
         flex-direction: column;
-        gap: 1rem;
+        gap:8px;
+    }
+    .nav-content {
+        padding: 4px;
+        flex-direction: row-reverse;
+        justify-content: space-evenly;
     }
 
     .nav-links {
@@ -620,6 +648,35 @@ footer {
 
     section {
         padding: 3rem 1rem;
+    }
+
+    .skills {
+        padding: 3rem 0.75rem;
+    }
+    
+    .skills-slider-container {
+        padding: 0 40px;
+    }
+    
+    .skill-card {
+        min-width: 240px;
+        padding: 1.5rem;
+    }
+    
+    .skill-card i {
+        font-size: 2.25rem;
+    }
+
+    .about-text p {
+        font-size: 1rem;
+    }
+
+    .about-content {
+        padding: 0.5rem;
+    }
+
+    .about-list{
+        margin-left: 20px;
     }
 }
 
@@ -710,6 +767,8 @@ footer {
     .hamburger.active .bar:nth-child(3) {
         transform: translateY(-8px) rotate(-45deg);
     }
+
+
 }
 
 /* Achievements Section */
