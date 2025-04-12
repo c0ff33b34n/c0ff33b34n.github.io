@@ -23,7 +23,7 @@
     }
 
     .container {
-      width: 90%;
+      width: 95%;
       max-width: 800px;
       text-align: center;
       background-color: #1e1e1e;
@@ -55,6 +55,7 @@
       border-radius: 10px;
       max-width: 100%;
       overflow: auto;
+      touch-action: none;
     }
 
     .cell {
@@ -113,10 +114,40 @@
     }
 
     @media (max-width: 600px) {
+      .container {
+        width: 100%;
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
       .cell {
-        width: 35px;
-        height: 35px;
-        font-size: 1em;
+        width: 30px;
+        height: 30px;
+        font-size: 0.9em;
+      }
+
+      .board {
+        padding: 0.5rem;
+      }
+
+      button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .cell {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8em;
       }
     }
   </style>
@@ -266,6 +297,43 @@
       gameBoard.innerHTML = '';
       initializeBoard();
     }
+
+    // Update grid template columns for mobile
+    function updateGridTemplate() {
+      const cellSize = window.innerWidth <= 600 ? (window.innerWidth <= 400 ? '25px' : '30px') : '40px';
+      gameBoard.style.gridTemplateColumns = `repeat(${cols}, ${cellSize})`;
+    }
+
+    // Call on load and resize
+    window.addEventListener('load', updateGridTemplate);
+    window.addEventListener('resize', updateGridTemplate);
+
+    // Add touch event handling
+    let touchStartX, touchStartY;
+    gameBoard.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    gameBoard.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      
+      // If it's a tap (not a swipe)
+      if (Math.abs(touchEndX - touchStartX) < 10 && Math.abs(touchEndY - touchStartY) < 10) {
+        const target = document.elementFromPoint(touchEndX, touchEndY);
+        if (target && target.classList.contains('cell')) {
+          const row = parseInt(target.dataset.row);
+          const col = parseInt(target.dataset.col);
+          revealCell(board[row][col]);
+        }
+      }
+    }, { passive: true });
+
+    // Prevent scrolling when touching the game board
+    gameBoard.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false });
 
     initializeBoard();
   </script>
