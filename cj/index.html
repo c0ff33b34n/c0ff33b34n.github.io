@@ -84,11 +84,26 @@
                 border-radius: 5px;
                 font-size: 0.9rem;
                 animation: fadeIn 0.3s ease-in-out;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background-color: #2d2d2d;
+            }
+
+            .error-message .status-icon {
+                font-size: 1.2rem;
             }
 
             .error-message:not(:empty) {
-                background-color: #2d2d2d;
-                border-left: 4px solid #00ff9d;
+                border-left: 4px solid;
+            }
+
+            .error-message:has(.status-icon:contains('⚠️')) {
+                border-color: #ffd700;
+            }
+
+            .error-message:has(.status-icon:contains('✅')) {
+                border-color: #00ff9d;
             }
 
             @keyframes fadeIn {
