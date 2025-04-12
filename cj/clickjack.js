@@ -22,60 +22,57 @@ document.addEventListener('DOMContentLoaded', function () {
         return url;
     }
 
-    function showError(message, isVulnerable = false) {
-        const existingError = document.querySelector('.error-message');
-        if (existingError) {
-            existingError.remove();
+    function showMessage(message, type = 'info') {
+        const existingMessage = document.querySelector('.error-message');
+        if (existingMessage) {
+            existingMessage.remove();
         }
 
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-message';
-        
-        // Create checkmark/warning icon
-        const icon = document.createElement('span');
-        icon.className = 'status-icon';
-        icon.textContent = isVulnerable ? '⚠️' : '✅';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'error-message';
         
         // Create message text
         const messageText = document.createElement('span');
         messageText.textContent = message;
+        messageDiv.appendChild(messageText);
         
-        errorDiv.appendChild(icon);
-        errorDiv.appendChild(messageText);
-        
-        urlInput.parentNode.insertBefore(errorDiv, submitButton.nextSibling);
+        urlInput.parentNode.insertBefore(messageDiv, submitButton.nextSibling);
     }
 
     function checkFrameability() {
         return new Promise((resolve) => {
-            // Set a timeout in case the load event doesn't fire
+            let isLoaded = false;
+            
+            // Set a timeout for the overall check
             const timeoutId = setTimeout(() => {
-                resolve(true); // If timeout occurs, site might be vulnerable
-            }, 5000);
+                if (!isLoaded) {
+                    resolve('timeout');
+                }
+            }, 10000);
 
             // Listen for load event
             iframe.onload = function() {
+                isLoaded = true;
                 clearTimeout(timeoutId);
+                
                 try {
-                    // First check if we can access the frame at all
-                    if (iframe.contentWindow) {
-                        // Try to access location - this will throw if X-Frame-Options is set
-                        const frameLocation = iframe.contentWindow.location.href;
-                        // If we get here, the page loaded in the frame
-                        resolve(true);
+                    // If we can access the frame content, it's vulnerable
+                    if (iframe.contentDocument || iframe.contentWindow) {
+                        resolve('vulnerable');
                     } else {
-                        resolve(false);
+                        resolve('protected');
                     }
                 } catch (e) {
-                    // If we can't access the frame, it's protected
-                    resolve(false);
+                    // If we get a security error, the frame is protected
+                    resolve('protected');
                 }
             };
 
             // Listen for error event
             iframe.onerror = function() {
+                isLoaded = true;
                 clearTimeout(timeoutId);
-                resolve(false);
+                resolve('error');
             };
         });
     }
@@ -88,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Validate URL
         if (!url) {
-            showError('Please enter a URL');
+            showMessage('Please enter a URL');
             return;
         }
 
@@ -99,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (!isValidUrl(url)) {
-            showError('Please enter a valid URL (e.g., https://example.com)');
+            showMessage('Please enter a valid URL (e.g., https://example.com)');
             return;
         }
 
@@ -111,21 +108,33 @@ document.addEventListener('DOMContentLoaded', function () {
         submitButton.disabled = true;
         submitButton.style.opacity = '0.7';
         submitButton.textContent = 'Testing...';
+        showMessage('Testing for clickjacking vulnerability...');
 
         try {
             // Load the URL in the iframe
             iframe.src = url;
             
             // Check if the page can be framed
-            const isVulnerable = await checkFrameability();
+            const result = await checkFrameability();
             
-            if (isVulnerable) {
-                showError('This site might be vulnerable to clickjacking! The page can be embedded in an iframe.', true);
-            } else {
-                showError('This site is protected against clickjacking');
+            // Clear any existing messages
+            const existingMessage = document.querySelector('.error-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            // Only show vulnerability message if we're sure
+            if (result === 'vulnerable' && iframe.contentWindow && iframe.contentWindow.length !== 0) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'error-message vulnerable';
+                messageDiv.innerHTML = `
+                    <span class="status-icon">⚠️</span>
+                    <span>This site might be vulnerable to clickjacking!</span>
+                `;
+                urlInput.parentNode.insertBefore(messageDiv, submitButton.nextSibling);
             }
         } catch (e) {
-            showError('Error testing the URL');
+            showMessage('Error testing the URL');
         } finally {
             // Reset button state
             submitButton.disabled = false;
