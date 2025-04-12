@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notepad App</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     html, body {
-      background: #1E1E1E;
+      background: #121212;
       color: #D4D4D4;
       height: 100%;
       width: 100%;
@@ -13,14 +20,55 @@
       padding: 0;
       overflow: hidden;
       display: flex;
+      flex-direction: column;
     }
+
+    .header {
+      background: #1e1e1e;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2d2d2d;
+    }
+
+    .header h1 {
+      color: #00ff9d;
+      font-size: 1.5rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #00ff9d;
+      color: #121212;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background-color: #00cc7d;
+      transform: translateY(-1px);
+    }
+
     #container {
       display: flex;
       height: 100%;
       width: 100%;
+      overflow: hidden;
     }
+
     #lineNumbers {
-      background: #252526;
+      background: #1e1e1e;
       color: #858585;
       padding: 10px 5px;
       font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -28,38 +76,71 @@
       user-select: none;
       overflow: hidden;
       white-space: nowrap;
+      border-right: 1px solid #2d2d2d;
+      min-width: 3em;
     }
+
     #notepad {
-      background: #1E1E1E;
+      background: #121212;
       color: #D4D4D4;
       height: 100%;
       width: 100%;
       padding: 10px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.5;
       font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
       box-sizing: border-box;
       border: none;
       resize: none;
       overflow: auto;
+      outline: none;
     }
+
     #lineNumbers, #notepad {
       line-height: 1.5;
     }
+
     ::selection {
       background: #264F78;
       color: #FFFFFF;
     }
+
     ::-moz-selection {
       background: #264F78;
       color: #FFFFFF;
     }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #3d3d3d;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4d4d4d;
+    }
   </style>
 </head>
 <body>
+  <div class="header">
+    <h1>Notepad</h1>
+    <div class="controls">
+      <button onclick="clearNote()">Clear</button>
+      <button onclick="downloadNote()">Download</button>
+    </div>
+  </div>
   <div id="container">
     <div id="lineNumbers"></div>
-    <textarea placeholder="Type here, see it here..." id="notepad"></textarea>
+    <textarea placeholder="Start typing here..." id="notepad" spellcheck="false"></textarea>
   </div>
   <script>
     const notepad = document.getElementById("notepad");
@@ -74,6 +155,31 @@
     // Save to localStorage
     const save = () => localStorage.setItem("notepad", notepad.value);
 
+    // Clear notepad
+    const clearNote = () => {
+      if (confirm("Are you sure you want to clear all text?")) {
+        notepad.value = "";
+        save();
+        updateLineNumbers();
+      }
+    };
+
+    // Download note as text file
+    const downloadNote = () => {
+      if (notepad.value.trim() === "") {
+        alert("Nothing to download!");
+        return;
+      }
+      
+      const blob = new Blob([notepad.value], { type: "text/plain" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "note.txt";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    };
+
     // Load from localStorage on page load
     if (window.localStorage) {
       notepad.value = localStorage.getItem("notepad") || "";
@@ -84,8 +190,21 @@
       save();
       updateLineNumbers();
     });
+
     notepad.addEventListener("scroll", () => {
       lineNumbers.scrollTop = notepad.scrollTop;
+    });
+
+    // Handle tab key
+    notepad.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = notepad.selectionStart;
+        const end = notepad.selectionEnd;
+        notepad.value = notepad.value.substring(0, start) + "  " + notepad.value.substring(end);
+        notepad.selectionStart = notepad.selectionEnd = start + 2;
+        save();
+      }
     });
 
     // Initial setup
