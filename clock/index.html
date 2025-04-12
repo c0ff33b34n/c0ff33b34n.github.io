@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .clock-container {
+            background-color: #1e1e1e;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 90%;
+            width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .clock-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(0, 255, 157, 0.05),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 10s infinite linear;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        .time {
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            color: #00ff9d;
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .date {
+            font-size: 1.2rem;
+            color: #aaaaaa;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .format-toggle {
+            background-color: #2d2d2d;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .format-toggle:hover {
+            background-color: #3d3d3d;
+            transform: translateY(-2px);
+        }
+
+        .format-toggle.active {
+            background-color: #00ff9d;
+            color: #121212;
+        }
+
+        .separator {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .time-unit {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .time-unit.changed {
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .clock-container {
+                padding: 30px;
+            }
+
+            .time {
+                font-size: 3rem;
+            }
+
+            .date {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .clock-container {
+                padding: 20px;
+            }
+
+            .time {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="time" id="time">00:00:00</div>
+        <div class="date" id="date">Monday, January 1, 2023</div>
+        <button class="format-toggle" id="formatToggle">24-Hour Format</button>
+    </div>
+
+    <script>
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+        const formatToggle = document.getElementById('formatToggle');
+        
+        let is24Hour = false;
+        let lastTime = '';
+        
+        // Update time and date
+        function updateClock() {
+            const now = new Date();
+            
+            // Format time
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            
+            let ampm = '';
+            
+            if (!is24Hour) {
+                ampm = hours >= 12 ? ' PM' : ' AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // Convert 0 to 12
+            }
+            
+            hours = hours.toString().padStart(2, '0');
+            
+            // Create time string with separators
+            const currentTime = `${hours}<span class="separator">:</span>${minutes}<span class="separator">:</span>${seconds}${ampm}`;
+            
+            // Check if time has changed to add animation
+            if (currentTime !== lastTime) {
+                timeElement.innerHTML = currentTime;
+                
+                // Add animation to changed units
+                const timeUnits = timeElement.querySelectorAll('.time-unit');
+                timeUnits.forEach(unit => {
+                    unit.classList.add('changed');
+                    setTimeout(() => {
+                        unit.classList.remove('changed');
+                    }, 300);
+                });
+                
+                lastTime = currentTime;
+            }
+            
+            // Format date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('en-US', options);
+            dateElement.textContent = dateString;
+        }
+        
+        // Toggle between 12 and 24 hour format
+        formatToggle.addEventListener('click', () => {
+            is24Hour = !is24Hour;
+            formatToggle.textContent = is24Hour ? '12-Hour Format' : '24-Hour Format';
+            formatToggle.classList.toggle('active');
+            updateClock();
+        });
+        
+        // Update clock immediately and then every second
+        updateClock();
+        setInterval(updateClock, 1000);
+        
+        // Add time-unit class to each digit for animation
+        function addTimeUnitClasses() {
+            const timeText = timeElement.innerHTML;
+            const newTimeText = timeText.replace(/(\d+)/g, '<span class="time-unit">$1</span>');
+            timeElement.innerHTML = newTimeText;
+        }
+        
+        // Initial setup
+        addTimeUnitClasses();
+        
+        // Update time units when format changes
+        formatToggle.addEventListener('click', addTimeUnitClasses);
+    </script>
+</body>
+</html> 
