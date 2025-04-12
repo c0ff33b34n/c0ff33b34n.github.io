@@ -37,6 +37,8 @@
 			max-width: 800px;
 			margin: 0 auto;
 			padding: 20px;
+			width: 100%;
+			box-sizing: border-box;
 		}
 
 		h1 {
@@ -59,6 +61,27 @@
 			display: block;
 		}
 
+		.input-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 15px;
+		}
+
+		.input-table td {
+			padding: 5px;
+			vertical-align: middle;
+		}
+
+		.input-table .label-cell {
+			width: 100px;
+			white-space: nowrap;
+		}
+
+		.input-table .button-cell {
+			width: 150px;
+			white-space: nowrap;
+		}
+
 		input[type="text"], textarea {
 			width: 100%;
 			padding: 12px;
@@ -68,12 +91,7 @@
 			color: #fff;
 			border-radius: 4px;
 			box-sizing: border-box;
-		}
-
-		input[type="text"]:focus, textarea:focus {
-			outline: none;
-			border-color: #00ff9d;
-			box-shadow: 0 0 5px #00ff9d;
+			font-size: 16px; /* Prevent zoom on iOS */
 		}
 
 		button {
@@ -85,11 +103,8 @@
 			cursor: pointer;
 			font-weight: bold;
 			transition: all 0.3s ease;
-		}
-
-		button:hover {
-			background: #00cc7d;
-			box-shadow: 0 0 10px #00ff9d;
+			width: 100%;
+			min-height: 44px; /* Minimum touch target size */
 		}
 
 		#result {
@@ -98,16 +113,19 @@
 			border-radius: 8px;
 			margin-top: 20px;
 			border: 1px solid #00ff9d;
+			overflow-x: auto;
 		}
 
 		#result table {
 			width: 100%;
 			border-collapse: collapse;
+			min-width: 300px;
 		}
 
 		#result td {
 			padding: 10px;
 			border-bottom: 1px solid #333;
+			word-break: break-word;
 		}
 
 		#result a {
@@ -135,6 +153,72 @@
 		.footer a:hover {
 			text-shadow: 0 0 5px #00ff9d;
 		}
+
+		@media (max-width: 768px) {
+			body {
+				padding: 10px;
+			}
+
+			.container {
+				padding: 10px;
+			}
+
+			h1 {
+				font-size: 2em;
+				margin-bottom: 20px;
+			}
+
+			.input-container {
+				padding: 15px;
+			}
+
+			.input-table {
+				display: block;
+			}
+
+			.input-table tr {
+				display: block;
+				margin-bottom: 15px;
+			}
+
+			.input-table td {
+				display: block;
+				width: 100% !important;
+				padding: 5px 0;
+			}
+
+			.input-table .label-cell {
+				margin-bottom: 5px;
+			}
+
+			button {
+				margin-top: 10px;
+			}
+
+			textarea {
+				min-height: 150px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			h1 {
+				font-size: 1.8em;
+			}
+
+			.input-container {
+				padding: 10px;
+			}
+
+			input[type="text"], textarea {
+				padding: 10px;
+				font-size: 14px;
+			}
+
+			button {
+				padding: 10px 20px;
+				font-size: 14px;
+			}
+		}
 	</style>
 </head>
 <body>
@@ -142,16 +226,16 @@
 		<h1>GitHub Dorking</h1>
 		<div class="input-container">
 			<div class="input-label">Enter GitHub dork parameters:</div>
-			<table style="width: 100%;">
+			<table class="input-table">
 				<tr>
-					<td style="width: 100px;">From URL:</td>
+					<td class="label-cell">From URL:</td>
 					<td><input type="text" id="url" value="https://raw.githubusercontent.com/c0ff33b34n/c0ff33b34n.github.io/main/gitdork/githubdork.txt"></td>
-					<td style="width: 150px;"><button onclick="getKeywords()">Get Keywords</button></td>
+					<td class="button-cell"><button onclick="getKeywords()">Get Keywords</button></td>
 				</tr>
 				<tr>
-					<td>Target:</td>
+					<td class="label-cell">Target:</td>
 					<td><input type="text" id="target" placeholder='"target" or org:target'></td>
-					<td><button onclick="Generate()">Generate Link</button></td>
+					<td class="button-cell"><button onclick="Generate()">Generate Link</button></td>
 				</tr>
 			</table>
 			<br>
