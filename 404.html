@@ -134,10 +134,12 @@
     const mineCount = 15;
 
     const board = [];
+    let isGameOver = false;  // Add game state tracker
     const gameBoard = document.getElementById('gameBoard');
     gameBoard.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
 
     function initializeBoard() {
+      isGameOver = false;  // Reset game state
       // Create the board array and DOM cells
       for (let row = 0; row < rows; row++) {
         const rowArray = [];
@@ -202,16 +204,17 @@
     }
 
     function revealCell(cell) {
-      if (cell.revealed || cell.flagged) return;
+      if (cell.revealed || cell.flagged || isGameOver) return;  // Check game state
 
       cell.revealed = true;
       cell.element.classList.add('revealed');
 
       if (cell.mine) {
         cell.element.classList.add('mine');
-        cell.element.textContent = '💣'; // Show bomb icon for mines
-        alert('Boom! You hit a mine! 💣');
-        revealAllMines(); // Reveal all mines when the player loses
+        cell.element.textContent = '💣';
+        isGameOver = true;  // Set game over state
+        revealAllMines();
+        alert('Boom! You hit a mine! 💣\nClick New Game to try again!');
         return;
       }
 
@@ -242,7 +245,7 @@
     }
 
     function toggleFlag(cell, element) {
-      if (cell.revealed) return;
+      if (cell.revealed || isGameOver) return;  // Check game state
 
       cell.flagged = !cell.flagged;
       element.classList.toggle('flag');
@@ -250,10 +253,11 @@
     }
 
     function checkWin() {
+      if (isGameOver) return;  // Don't check for win if game is over
       const unrevealedCells = board.flat().filter(cell => !cell.revealed);
       if (unrevealedCells.every(cell => cell.mine)) {
-        alert('You win! 🎉');
-        resetGame();
+        isGameOver = true;  // Set game over state
+        alert('You win! 🎉\nClick New Game to play again!');
       }
     }
 
