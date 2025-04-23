@@ -1,0 +1,99 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+    --primary-color: #1a1a1a;
+    --secondary-color: #2962ff;
+    --accent-color: #2962ff;
+    --text-color: #e0e0e0;
+    --dark-bg: #0a0a0a;
+    --card-bg: #1a1a1a;
+    --border-color: #333;
+    --positive-change: #4CAF50;
+    --negative-change: #F44336;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: var(--dark-bg);
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: none; /* Hide the header since it's empty */
+}
+
+.chart-container {
+    background: var(--card-bg);
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    flex: 1;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+}
+
+#tradingview_chart {
+    width: 100%;
+    height: 100%;
+}
+
+.controls {
+    display: none; /* Hide the controls */
+}
+
+.btn {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.btn.active {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.tradingview-widget-copyright {
+    display: none; /* Hide the copyright text for fullscreen */
+}
+
+.blue-text {
+    color: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 100vh; /* Full viewport height on mobile too */
+    }
+} 
