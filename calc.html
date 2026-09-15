@@ -141,7 +141,7 @@
             <label for="currencyPair">Currency Pair:</label>
             <select id="currencyPair" aria-label="Currency Pair">
                 <option value="10">EUR/USD</option>
-                <option value="100">XAU/USD</option>
+                <option value="100" selected>XAU/USD</option>
             </select>
         </div>
 
@@ -265,7 +265,7 @@
             document.getElementById('riskPercentage').value = '';
             document.getElementById('riskAmount').value = '';
             document.getElementById('stopLoss').value = '';
-            document.getElementById('currencyPair').value = '10';
+            document.getElementById('currencyPair').value = '100';
             riskPercentageOption.checked = true;
             riskAmountOption.checked = false;
             riskPercentageGroup.style.display = 'block';
